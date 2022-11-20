@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:id="@+id/parent_linear">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Highscores"
+        android:textAlignment="center"
+        android:paddingBottom="10dp"
+        android:textSize="30dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:layout_marginBottom="20dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Niveau de difficulté: "
+            android:gravity="center"
+            android:layout_weight="1"/>
+        <Spinner
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:entries="@array/difficulty_highscore"
+            android:prompt="@string/diff_score"
+            android:id="@+id/spinner_difficulty_highscore"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            />
+    </LinearLayout>
+
+
+
+    <!--/////////////////////////////////////////////////-->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="#"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:background="@drawable/row_borders"
+            android:textSize="15dp"
+            android:padding="10dp"/>
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Nom"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:background="@drawable/row_borders"
+            android:textSize="15dp"
+            android:padding="10dp"/>
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Score"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:background="@drawable/row_borders"
+            android:textSize="15dp"
+            android:padding="10dp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Supprimer"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:background="@drawable/row_borders"
+            android:textSize="15dp"
+            android:padding="10dp"/>
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/tabContainer"
+        android:layout_marginBottom="20dp">
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/btn_remove_all"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:text="Remove All"
+        android:layout_marginBottom="10dp"
+        />
+
+</LinearLayout>

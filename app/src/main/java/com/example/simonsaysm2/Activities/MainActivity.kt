@@ -1,4 +1,5 @@
-package com.example.simonsaysm2
+package com.example.simonsaysm2.Activities
+
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -18,17 +19,23 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.example.simonsaysm2.Database.AppDatabase
+import com.example.simonsaysm2.Database.Player
+import com.example.simonsaysm2.R
+import kotlinx.android.synthetic.main.activity_main_party.*
+import kotlinx.android.synthetic.main.data_party.*
 
 
 class MainActivity : AppCompatActivity() {
     private var temp: Int = 0
-    private val tabColorName = arrayOf("RED", "BLUE", "GREEN", "YELLOW")
-    private val tabColorHex = arrayOf("#FF0000", "#4169E1", "#008000", "#FFFF00")
-    private val colorR = arrayOf(R.color.red, R.color.blue, R.color.green, R.color.yellow)
+    private val tabColorName = arrayOf("RED", "BLUE", "GREEN", "YELLOW", "BROWN", "PURPLE")
+    private val tabColorHex = arrayOf("#FF0000", "#4169E1", "#008000", "#FFFF00", "#A73A03", "#D006BE")
+    private val colorR = arrayOf(R.color.red, R.color.blue, R.color.green, R.color.yellow, R.color.brown, R.color.purple)
     private var listeBtnNextColor: MutableList<Button> = mutableListOf()
     private var gagne = true
     private var btnColor: MutableList<Button> = mutableListOf()
 
+    private lateinit var difficulty: String
     private var nbBtnOpt: Int = 1
     private var animBtn = true
 
@@ -42,15 +49,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_party)
-        var btn_color1 = findViewById<Button>(R.id.btn_color1)
+
         //recupere le nombre de btn de couleur a retenir chaque tour (1,2,3) | le niveau de difficulté (Facile, Nomal, Difficile) | utilisation d'animation ou non pour les boutons
-        this.listeBtnNextColor.addAll(arrayOf(btn_color1))
+
+        this.listeBtnNextColor.addAll(arrayOf(btn_color1, btn_color2, btn_color3))
 
         this.nbBtnOpt = this.intent.getIntExtra("nb_btn_opt", 1)
+        this.difficulty = this.intent.getStringExtra("difficulty").toString()
+        this.animBtn = this.intent.getBooleanExtra("animSwitch", this.animBtn)
 
 
-        btnDataParty()
-        setBtnDifficulte()
+        btnDataParty()  //affiche 1/2/3 boutons dans l'en tête suivant le nombre de boutons par tours (options)
+        setBtnDifficulte()  //affiche 2/4/6 boutons suivant la difficulté choisit (options)
         nextLevel() //lancement de la 1ere manche
 
     }
@@ -58,18 +68,21 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun setBtnDifficulte() {    //fonction qui affiche 2/4/6 boutons en fonction de la difficulté (dans les parametres)
-        var table_row_1 = findViewById<TableRow>(R.id.table_row_1)
-        var table_row_2 = findViewById<TableRow>(R.id.table_row_2)
-
-        var btn_1_T = findViewById<Button>(R.id.btn_1_T)
-        var btn_2_T = findViewById<Button>(R.id.btn_2_T)
-        var btn_3_T = findViewById<Button>(R.id.btn_3_T)
-        var btn_4_T = findViewById<Button>(R.id.btn_4_T)
-
-
-        table_row_1.visibility = View.VISIBLE
-        table_row_2.visibility = View.VISIBLE
-        this.tab.addAll(listOf(btn_1_T, btn_2_T, btn_3_T, btn_4_T))
+        if(this.difficulty == "Facile"){
+            table_row_1.visibility = View.VISIBLE
+            this.tab.addAll(listOf(btn_1_T, btn_2_T))
+        }
+        else if(this.difficulty == "Normal"){
+            table_row_1.visibility = View.VISIBLE
+            table_row_2.visibility = View.VISIBLE
+            this.tab.addAll(listOf(btn_1_T, btn_2_T, btn_3_T, btn_4_T))
+        }
+        else if(this.difficulty == "Difficile"){
+            table_row_1.visibility = View.VISIBLE
+            table_row_2.visibility = View.VISIBLE
+            table_row_3.visibility = View.VISIBLE
+            this.tab.addAll(listOf(btn_1_T, btn_2_T, btn_3_T, btn_4_T, btn_5_T, btn_6_T))
+        }
 
         tab.forEach {   //permet l'ajout d'un listener pour chaque boutons
             it.visibility = View.VISIBLE
@@ -123,7 +136,7 @@ class MainActivity : AppCompatActivity() {
 
 
 
-    private fun btnDataParty(){
+    private fun btnDataParty(){ //bouton permettant de connaitre les prochaines couleurs (1,2 ou 3 boutons par tour suivant le choix dans les paramètres)
         this.listeBtnNextColor.forEach {
             it.visibility = View.GONE
         }
@@ -135,7 +148,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun nextLevel() {       //fonction pour generer les prochaines couleurs a retenir
         for(j in 1..this.nbBtnOpt){
-            var i=3
+            var i=0
+            if (this.difficulty == "Facile") {
+                i = 1
+            } else if (this.difficulty == "Normal") {
+                i = 3
+            } else if (this.difficulty == "Difficile") {
+                i = 5
+            }
 
             temp = (0..i).random()
             listColorParty.add(tab[temp])
@@ -168,7 +188,6 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("SetTextI18n")
     private fun verifCouleur(){     //fonction qui verifie les couleurs generé aléatoirement avec celles saisie par le joueur
         var i = 0
-        var tv_val_score = findViewById<TextView>(R.id.tv_val_score)
         while(i<listColorParty.size){
 
             if(listColorParty[i].id.toString() == listColorPlayer[i]){
@@ -190,8 +209,7 @@ class MainActivity : AppCompatActivity() {
             listColorPlayer.clear()
         }else{
             Toast.makeText(this, "Perdu", Toast.LENGTH_SHORT).show()
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            this.popupNamePlayer()
         }
         this.nextLevel()
     }
@@ -199,9 +217,42 @@ class MainActivity : AppCompatActivity() {
 
 
 
+    private fun popupNamePlayer(){  //crée une popup qui contient le score ainsi qu'un champs pour saisir le nom
+        val builder = AlertDialog.Builder(this)
+
+        builder.setTitle("Partie terminé")
+        builder.setMessage("Votre score est de " + tv_val_score.text)
+        builder.setCancelable(false)
+
+        val editTextNamePlayer = EditText(this)
+        builder.setView(editTextNamePlayer)
+
+        builder.setPositiveButton("Ok") { _, _ ->
+            saveDataPlayer(editTextNamePlayer, tv_val_score)    //ajout a la bdd avec le score et le nom saisie dans l'edit text
+            finish()
+            val intent = Intent(this, ActivityStart::class.java)
+            startActivity(intent)
+        }
+        builder.show()
+    }
 
 
 
+    private fun saveDataPlayer(playerDataName: EditText, playerDataScore: TextView) {
+        var nomJoueur: String
+        if(playerDataName.text.isEmpty()){
+            nomJoueur = "???"
+        }else{
+            nomJoueur = playerDataName.text.toString()
+        }
+
+        val scoreP = (playerDataScore.text.toString()).toLong()
+
+        Log.d("test123", nomJoueur)
+
+        AppDatabase.get(application).playerDao().insertPlayer(Player(nomJoueur, scoreP, this.difficulty))
+        Log.d("test123", "$nomJoueur a bien ete ajoute avec un score de $scoreP")
+    }
 
 
 }

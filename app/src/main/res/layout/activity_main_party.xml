@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="MainActivity"
+    tools:context=".Activities.MainActivity"
     android:padding="10dp"
     android:layout_gravity="center_horizontal"
     android:orientation="vertical"
@@ -82,6 +82,36 @@
 
         </TableRow>
 
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:id="@+id/table_row_3"
+            android:visibility="gone"
+            >
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/btn_5_T"
+                android:backgroundTint="@color/brown"
+                android:layout_marginEnd="5dp"
+
+                />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/btn_6_T"
+                android:backgroundTint="@color/purple"
+                android:layout_marginStart="5dp"
+
+                />
+
+        </TableRow>
 
 
 
