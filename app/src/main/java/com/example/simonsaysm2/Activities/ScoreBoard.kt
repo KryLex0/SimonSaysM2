@@ -37,17 +37,17 @@ class ScoreBoard : AppCompatActivity() {
         }
     }
 
-
-    private fun removeAll(){    //remove tout le contenue de la bdd
+    //remove all content of DB
+    private fun removeAll(){
         AppDatabase.get(application).playerDao().deleteAll()
         finish()
         startActivity(intent)
     }
 
 
-    //fonction qui recupere les 10 meilleurs score en fonction du niveau de difficulté (Facile, Normal, Difficile) OU tous sans distinction
+    //retrieve last 10 highscore based on difficulty
     private fun dataScorePlayer(difficulty: String) {
-        tabContainer.removeAllViews()   //clear le contenu du scoreBoard
+        tabContainer.removeAllViews()   //clear content of scoreBoard
 
         var listPlayerData: List<Player> = AppDatabase.get(application).playerDao().getTenLastAll()
         if(difficulty == "All"){
@@ -60,8 +60,8 @@ class ScoreBoard : AppCompatActivity() {
             listPlayerData = AppDatabase.get(application).playerDao().getTenLastDifficile()
         }
 
-
-        if(listPlayerData.isEmpty()){   //Affiche un message si aucune donnée présente dans la bdd suivant le niveau de difficulté
+        //if no data in database for selected difficulty, display a message to notify user
+        if(listPlayerData.isEmpty()){
             var emptyV = TextView(this)
             emptyV.textSize = 20F
             emptyV.text = "Aucune donnée disponible"
@@ -78,22 +78,33 @@ class ScoreBoard : AppCompatActivity() {
 
 
 
-    private fun displayPlayerHighscore(listPlayerData: List<Player>) {   //affiche les 10 derniers meilleurs score (ajout dynamiquement)
+    //display last 10 highscores dynamically
+    private fun displayPlayerHighscore(listPlayerData: List<Player>) {
         var rang = 1
 
 
         listPlayerData.forEach { it ->
-            //creation d'un linear layout qui contiendra les infos
+            //create linearLayout to display each DB lines
             val parent = LinearLayout(this)
             parent.layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
             parent.orientation = LinearLayout.HORIZONTAL
+/*
+            //textview for the ranking
+            val tv0 = TextView(this)
+            tv0.text = rang.toString()
+            tv0.layoutParams =
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+            tv0.textAlignment = View.TEXT_ALIGNMENT_CENTER
+            tv0.setBackgroundResource(R.drawable.row_borders)
+            tv0.setPadding(15)
+            parent.addView(tv0)
 
-            //textview qui contient le rang
+            //textview for name
             val tv1 = TextView(this)
-            tv1.text = rang.toString()
+            tv1.text = it.name
             tv1.layoutParams =
                 LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
             tv1.textAlignment = View.TEXT_ALIGNMENT_CENTER
@@ -101,9 +112,9 @@ class ScoreBoard : AppCompatActivity() {
             tv1.setPadding(15)
             parent.addView(tv1)
 
-            //textview qui contient le nom
+            //textview for score
             val tv2 = TextView(this)
-            tv2.text = it.name
+            tv2.text = it.score.toString()
             tv2.layoutParams =
                 LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
             tv2.textAlignment = View.TEXT_ALIGNMENT_CENTER
@@ -111,9 +122,9 @@ class ScoreBoard : AppCompatActivity() {
             tv2.setPadding(15)
             parent.addView(tv2)
 
-            //textview qui contient le score
+            //textview for duration
             val tv3 = TextView(this)
-            tv3.text = it.score.toString()
+            tv3.text = it.time.toString()
             tv3.layoutParams =
                 LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
             tv3.textAlignment = View.TEXT_ALIGNMENT_CENTER
@@ -121,7 +132,7 @@ class ScoreBoard : AppCompatActivity() {
             tv3.setPadding(15)
             parent.addView(tv3)
 
-            //textview qui permet de supprimer la ligne de la bdd
+            //textview to delete the line in DB
             val tv4 = TextView(this)
             tv4.text = "X"
             tv4.layoutParams =
@@ -129,6 +140,41 @@ class ScoreBoard : AppCompatActivity() {
             tv4.textAlignment = View.TEXT_ALIGNMENT_CENTER
             tv4.setBackgroundResource(R.drawable.row_borders)
             tv4.setPadding(15)
+*/
+            //textview for the ranking
+            val tv0 = TextView(this)
+            //textview for name
+            val tv1 = TextView(this)
+            //textview for score
+            val tv2 = TextView(this)
+            //textview for duration
+            val tv3 = TextView(this)
+            //textview to delete the line in DB
+            val tv4 = TextView(this)
+            var tmpArrayTextView = arrayOf(tv0, tv1, tv2, tv3, tv4)
+            var tmpText = ""
+
+            for(i in 0..4) {
+
+                when(i) {
+                    0 -> tmpText = rang.toString()
+                    1 -> tmpText = it.name
+                    2 -> tmpText = it.score.toString()
+                    3 -> tmpText = it.time
+                    4 -> tmpText = "X"
+                }
+                tmpArrayTextView[i].text = tmpText
+                tmpArrayTextView[i].layoutParams =
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                tmpArrayTextView[i].textAlignment = View.TEXT_ALIGNMENT_CENTER
+                tmpArrayTextView[i].setBackgroundResource(R.drawable.row_borders)
+                tmpArrayTextView[i].setPadding(15)
+                if(i != 4) {
+                    parent.addView(tmpArrayTextView[i])
+                }
+            }
+
+
 
             val playerId = it.id
             tv4.setOnClickListener {
@@ -136,7 +182,7 @@ class ScoreBoard : AppCompatActivity() {
                 val builder = AlertDialog.Builder(this)
 
                 builder.setTitle("Supprimer?")
-                builder.setMessage("Rang: " + tv1.text + "\nNom: " + tv2.text + "\nScore: " + tv3.text)
+                builder.setMessage("Rang: " + tv0.text + "\nNom: " + tv1.text + "\nScore: " + tv2.text + "\nTemps: " + tv3.text)
                 builder.setCancelable(false)
 
                 builder.setPositiveButton("Oui") { _, _ ->
@@ -150,7 +196,8 @@ class ScoreBoard : AppCompatActivity() {
             }
             parent.addView(tv4)
 
-            tabContainer.addView(parent)    //ajout dans un container (déja présent dans le xml activity_score_board) chaque ligne généré dynamiquement
+            //add all textviews to a container already create in xml activity_score_board
+            tabContainer.addView(parent)
 
             rang += 1
         }

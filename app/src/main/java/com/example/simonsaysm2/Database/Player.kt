@@ -9,7 +9,8 @@ data class Player(
     @PrimaryKey(autoGenerate = true) var id: Long = 0,
     val name:String,
     val score: Long,
-    val difficulty: String
+    val difficulty: String,
+    val time: String
 ){
-    constructor(name: String, score: Long, difficulty: String) : this(0, name, score, difficulty)
+    constructor(name: String, score: Long, difficulty: String, time: String) : this(0, name, score, difficulty, time)
 }

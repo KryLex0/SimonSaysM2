@@ -81,7 +81,16 @@
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Supprimer"
+            android:text="Temps"
+            android:layout_weight="1"
+            android:textAlignment="center"
+            android:background="@drawable/row_borders"
+            android:textSize="15dp"
+            android:padding="10dp"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Action"
             android:layout_weight="1"
             android:textAlignment="center"
             android:background="@drawable/row_borders"

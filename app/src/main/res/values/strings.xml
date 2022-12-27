@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">SimonSaysM2</string>
     <string name="couleur">Prochaine Couleur : </string>
-    <string name="score">Score : </string>
+    <string name="score">Score :  </string>
     <string name="score_val">0</string>
     <string name="start">Start</string>
     <string name="highscore">Tableau des Scores</string>

@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import android.view.View
 import android.view.animation.AlphaAnimation
@@ -24,6 +25,9 @@ import com.example.simonsaysm2.Database.Player
 import com.example.simonsaysm2.R
 import kotlinx.android.synthetic.main.activity_main_party.*
 import kotlinx.android.synthetic.main.data_party.*
+import kotlin.concurrent.timer
+import kotlinx.coroutines.*
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -43,6 +47,8 @@ class MainActivity : AppCompatActivity() {
 
     private var listColorParty: MutableList<Button> = mutableListOf() //= arrayOf<Button>()
     private var listColorPlayer: MutableList<String> = mutableListOf() //= arrayOf<String>()
+    private var timerParty = initTimer()
+    private var timerRunning: Boolean = true
 
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -50,24 +56,74 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_party)
 
-        //recupere le nombre de btn de couleur a retenir chaque tour (1,2,3) | le niveau de difficulté (Facile, Nomal, Difficile) | utilisation d'animation ou non pour les boutons
-
         this.listeBtnNextColor.addAll(arrayOf(btn_color1, btn_color2, btn_color3))
 
         this.nbBtnOpt = this.intent.getIntExtra("nb_btn_opt", 1)
         this.difficulty = this.intent.getStringExtra("difficulty").toString()
         this.animBtn = this.intent.getBooleanExtra("animSwitch", this.animBtn)
 
+        startTimer()
 
-        btnDataParty()  //affiche 1/2/3 boutons dans l'en tête suivant le nombre de boutons par tours (options)
-        setBtnDifficulte()  //affiche 2/4/6 boutons suivant la difficulté choisit (options)
-        nextLevel() //lancement de la 1ere manche
+        btnDataParty()  //display 1/2/3 btn in header based on the numbers of new colors foreach round set in the settings
+        setBtnDifficulte()  //display 2/4/6 btn in the layout based on the difficulty
+        nextLevel() //start game
 
+
+    }
+    //update timer for minutes and seconds
+    private fun initTimer():  CountDownTimer{
+        val timer = object: CountDownTimer(10000000000000000, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                //cast to int
+                var tmpSeconds = Integer.parseInt(timerSeconds.text as String)
+                var tmpMinutes = Integer.parseInt(timerMinutes.text as String)
+
+                var newTimerMinutes = ""
+                var newTimerSeconds = ""
+
+                if(timerRunning) {
+                    if (tmpSeconds == 59) {
+                        tmpMinutes += 1
+                        tmpSeconds = 0
+                    } else {
+                        tmpSeconds += 1
+                    }
+                }
+
+                newTimerMinutes = tmpMinutes.toString()
+                newTimerSeconds = tmpSeconds.toString()
+
+                //add "0" at the start if lower than 10
+                if(tmpMinutes < 10){
+                    newTimerMinutes = "0$newTimerMinutes"
+                }
+                if(tmpSeconds < 10){
+                    newTimerSeconds = "0$newTimerSeconds"
+                }
+                timerMinutes.text = newTimerMinutes
+                timerSeconds.text = newTimerSeconds
+            }
+            override fun onFinish() {
+                // do something
+            }
+
+        }
+
+        return timer
+    }
+    private fun startTimer(){
+        timerParty.start()
+        timerRunning = true
+    }
+    private fun pauseTimer(){
+        timerParty.cancel()
+        timerRunning = false
     }
 
 
 
-    private fun setBtnDifficulte() {    //fonction qui affiche 2/4/6 boutons en fonction de la difficulté (dans les parametres)
+    //function to display 2/4/6 buttons in the layout based on difficulty set in settings
+    private fun setBtnDifficulte() {
         if(this.difficulty == "Facile"){
             table_row_1.visibility = View.VISIBLE
             this.tab.addAll(listOf(btn_1_T, btn_2_T))
@@ -84,14 +140,19 @@ class MainActivity : AppCompatActivity() {
             this.tab.addAll(listOf(btn_1_T, btn_2_T, btn_3_T, btn_4_T, btn_5_T, btn_6_T))
         }
 
-        tab.forEach {   //permet l'ajout d'un listener pour chaque boutons
+        //add listener to each btn
+        tab.forEach {
             it.visibility = View.VISIBLE
             val btn = it.id
             Log.d("123321", it.toString())
             it.setOnClickListener {
-                listColorPlayer.add(btn.toString())  //ajout du bouton clique par le joueur dans une liste
-                if(listColorParty.size == listColorPlayer.size) {   //compare le nombre de boutons clique par le joueur au nombre de bouton a cliquer dans la partie actuelle
-                    this.verifCouleur() //appel de la fonction qui compare les boutons du joueurs avec les boutons generes
+                //add user btn choice to array
+                listColorPlayer.add(btn.toString())
+                //compare number of btn clicked by user and total btn
+                //to check when the user click on the max btn
+                if(listColorParty.size == listColorPlayer.size) {
+                    //verify the colors from user
+                    this.verifCouleur()
                 }
             }
         }
@@ -99,10 +160,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-
-
-    private fun animButton(btn: MutableList<Button>, index: Int){   //fonction d'animation des boutons
+    //animation of buttons
+    private fun animButton(btn: MutableList<Button>, index: Int){
         val anim: Animation = AlphaAnimation(1.0f, 0.2f)
         anim.duration = 250
         anim.startOffset = 500
@@ -111,12 +170,14 @@ class MainActivity : AppCompatActivity() {
 
         btn[index].startAnimation(anim)
 
-        //evite de lancer plusieurs fois la meme animation d'un bouton en même temps
+        //make the animations running one by one
         anim.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationRepeat(animation: Animation?) {}
-            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationStart(animation: Animation?) {
+                pauseTimer()
+            }
 
-            //permet de bien attendre la fin de chaque animations pour commencer la suivante
+            //wait current animation to end before starting the next one
             override fun onAnimationEnd(animation: Animation?) {
                 val index1 = index + 1
                 if(index < btn.size - 1) {
@@ -128,15 +189,19 @@ class MainActivity : AppCompatActivity() {
                     }
 
                 }
+                startTimer()
+
             }
         })
+
+
 
     }
 
 
 
-
-    private fun btnDataParty(){ //bouton permettant de connaitre les prochaines couleurs (1,2 ou 3 boutons par tour suivant le choix dans les paramètres)
+    //colored btn in layout to know next colors based on difficulty
+    private fun btnDataParty(){
         this.listeBtnNextColor.forEach {
             it.visibility = View.GONE
         }
@@ -145,8 +210,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    private fun nextLevel() {       //fonction pour generer les prochaines couleurs a retenir
+    //function to add new random colors for next round
+    private fun nextLevel() {
         for(j in 1..this.nbBtnOpt){
             var i=0
             if (this.difficulty == "Facile") {
@@ -160,7 +225,7 @@ class MainActivity : AppCompatActivity() {
             temp = (0..i).random()
             listColorParty.add(tab[temp])
 
-            //animation des boutons de l'entete pour permettre a l'utilisateur de comprendre que ce sont de nouvelles couleurs
+            //animate colored btn in header to notify user these are the new colors
             val anim: Animation = AlphaAnimation(1.0f, 0.2f)
             anim.duration = 100
             anim.startOffset = 200
@@ -168,12 +233,12 @@ class MainActivity : AppCompatActivity() {
             anim.repeatMode = Animation.REVERSE
             this.listeBtnNextColor[j-1].startAnimation(anim)
 
-            //change la couleur des boutons dans l'en tete pour connaitre les prochaines couleurs
-            //this.listeBtnNextColor[j-1].text = tabColorName[temp]
+            //change btn colors in header
             this.listeBtnNextColor[j-1].setBackgroundColor(Color.parseColor(tabColorHex[temp]))
         }
 
-        if(this.gagne && this.animBtn) {    //si la derniere manche est gagné et l'animation des boutons est active (choix dans les parametres), anim les boutons des couleurs a retenir
+        //if last round was won and animation are enabled in settings, anim all btn to remember
+        if(this.gagne && this.animBtn) {
             tab.forEach {
                 it.isClickable = false
             }
@@ -186,7 +251,8 @@ class MainActivity : AppCompatActivity() {
 
 
     @SuppressLint("SetTextI18n")
-    private fun verifCouleur(){     //fonction qui verifie les couleurs generé aléatoirement avec celles saisie par le joueur
+    //check if user choices are the same as the generated colors
+    private fun verifCouleur(){
         var i = 0
         while(i<listColorParty.size){
 
@@ -200,8 +266,8 @@ class MainActivity : AppCompatActivity() {
             }
             i += 1
         }
+        //if the user choices are correct, update score and clear array of colors in header
         if(gagne){
-            //incremente la score suivant la difficulté et clear la liste des boutons saisies pour le prochain tour
             Toast.makeText(this, "Gagné", Toast.LENGTH_SHORT).show()
             var scoreTemp = 0
             if(this.nbBtnOpt == 1){scoreTemp = 1}else if(this.nbBtnOpt == 2){scoreTemp = 2} else if(this.nbBtnOpt == 3){scoreTemp = 3}
@@ -211,24 +277,27 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Perdu", Toast.LENGTH_SHORT).show()
             this.popupNamePlayer()
         }
+
+
         this.nextLevel()
     }
 
 
 
-
-    private fun popupNamePlayer(){  //crée une popup qui contient le score ainsi qu'un champs pour saisir le nom
+    //create popup to display user score and let user choose a name
+    private fun popupNamePlayer(){
         val builder = AlertDialog.Builder(this)
 
         builder.setTitle("Partie terminé")
-        builder.setMessage("Votre score est de " + tv_val_score.text)
+        var timerTotalValue = timerMinutes.text.toString() + ":" + timerSeconds.text.toString()
+        builder.setMessage("Votre score est de " + tv_val_score.text + "\nDurée de la partie: " + timerTotalValue)
         builder.setCancelable(false)
 
         val editTextNamePlayer = EditText(this)
         builder.setView(editTextNamePlayer)
 
         builder.setPositiveButton("Ok") { _, _ ->
-            saveDataPlayer(editTextNamePlayer, tv_val_score)    //ajout a la bdd avec le score et le nom saisie dans l'edit text
+            saveDataPlayer(editTextNamePlayer, tv_val_score, timerTotalValue)    //ajout a la bdd avec le score et le nom saisie dans l'edit text
             finish()
             val intent = Intent(this, ActivityStart::class.java)
             startActivity(intent)
@@ -237,8 +306,8 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
-    private fun saveDataPlayer(playerDataName: EditText, playerDataScore: TextView) {
+    //save date in DB
+    private fun saveDataPlayer(playerDataName: EditText, playerDataScore: TextView, playerDataTime: String) {
         var nomJoueur: String
         if(playerDataName.text.isEmpty()){
             nomJoueur = "???"
@@ -250,7 +319,7 @@ class MainActivity : AppCompatActivity() {
 
         Log.d("test123", nomJoueur)
 
-        AppDatabase.get(application).playerDao().insertPlayer(Player(nomJoueur, scoreP, this.difficulty))
+        AppDatabase.get(application).playerDao().insertPlayer(Player(nomJoueur, scoreP, this.difficulty, playerDataTime))
         Log.d("test123", "$nomJoueur a bien ete ajoute avec un score de $scoreP")
     }
 
