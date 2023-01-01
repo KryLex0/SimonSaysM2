@@ -2,7 +2,6 @@ package com.example.simonsaysm2.Activities
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -22,7 +21,8 @@ import kotlinx.android.synthetic.main.activity_options.*
 
 class ActivityOptions : AppCompatActivity() {
     private lateinit var difficulty: String
-    private var isSwitchChecked = true
+    private var isSwitchCheckedAnimation = true
+    //private var isSwitchCheckedCompetitiveMode = false
     private var nbBtnOpt = 1
 
 
@@ -33,10 +33,13 @@ class ActivityOptions : AppCompatActivity() {
         setContentView(R.layout.activity_options)
 
         this.difficulty = this.intent.getStringExtra("difficulty").toString()
-        getIndex(spinner_difficulty, this.difficulty)   //remettre la difficulté comme selectionné avant et pas a la valeur initial (Facile)
+        getIndex(spinner_difficulty, this.difficulty)   //restore difficulty previously set
 
-        this.isSwitchChecked = this.intent.getBooleanExtra("animSwitch", isSwitchChecked)
-        switch_anim.isChecked = this.isSwitchChecked
+        this.isSwitchCheckedAnimation = this.intent.getBooleanExtra("animSwitch", isSwitchCheckedAnimation)
+        switch_anim.isChecked = this.isSwitchCheckedAnimation
+
+//        this.isSwitchCheckedCompetitiveMode = this.intent.getBooleanExtra("competitiveMode", isSwitchCheckedCompetitiveMode)
+//        switch_competitive_mode.isChecked = this.isSwitchCheckedCompetitiveMode
 
         this.nbBtnOpt = this.intent.getIntExtra("nb_btn_opt", this.nbBtnOpt)
         nb_btn_option.text = this.nbBtnOpt.toString()
@@ -45,10 +48,12 @@ class ActivityOptions : AppCompatActivity() {
 
         val intent = Intent(applicationContext, ActivityStart::class.java)
 
-        switch_anim.setOnCheckedChangeListener { buttonView, isChecked ->
+        switch_anim.setOnCheckedChangeListener { _, isChecked ->
             intent.putExtra("animSwitch", isChecked)
         }
-
+//        switch_competitive_mode.setOnCheckedChangeListener { _, isChecked ->
+//            intent.putExtra("competitiveMode", isChecked)
+//        }
 
 
         sk_nb_btn_option.setOnSeekBarChangeListener(object :

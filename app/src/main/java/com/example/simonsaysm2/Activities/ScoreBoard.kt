@@ -153,19 +153,31 @@ class ScoreBoard : AppCompatActivity() {
             val tv4 = TextView(this)
             var tmpArrayTextView = arrayOf(tv0, tv1, tv2, tv3, tv4)
             var tmpText = ""
+            var weight: Float
 
             for(i in 0..4) {
-
-                when(i) {
-                    0 -> tmpText = rang.toString()
-                    1 -> tmpText = it.name
-                    2 -> tmpText = it.score.toString()
-                    3 -> tmpText = it.time
-                    4 -> tmpText = "X"
+                weight = 1.0f
+                when (i) {
+                    0 -> {
+                        tmpText = rang.toString()
+                        weight = 0.5f
+                    }
+                    1 -> {
+                        tmpText = it.name
+                    }
+                    2 -> {
+                        tmpText = it.score.toString()
+                    }
+                    3 -> {
+                        tmpText = it.time
+                    }
+                    4 -> {
+                        tmpText = "X"
+                    }
                 }
                 tmpArrayTextView[i].text = tmpText
                 tmpArrayTextView[i].layoutParams =
-                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f)
+                    LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, weight)
                 tmpArrayTextView[i].textAlignment = View.TEXT_ALIGNMENT_CENTER
                 tmpArrayTextView[i].setBackgroundResource(R.drawable.row_borders)
                 tmpArrayTextView[i].setPadding(15)

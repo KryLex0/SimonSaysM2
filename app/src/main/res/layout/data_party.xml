@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/timerLayout">
+        android:id="@+id/timerLayoutGlobal">
 
         <TextView
             android:id="@+id/timerTotal"
@@ -92,7 +92,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal">
         <TextView
             android:layout_width="match_parent"
@@ -107,7 +106,30 @@
             android:gravity="center"
             android:id="@+id/tv_val_score" />
     </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="10dp"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/timerLayoutLeft">
 
+        <TextView
+            android:id="@+id/timerLeft"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:gravity="center"
+            android:text="Temps restant: " />
+
+        <TextView
+            android:id="@+id/timerSecondsLeft"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="00" />
+
+    </LinearLayout>
 
 
 </LinearLayout>
