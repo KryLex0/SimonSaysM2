@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_options.*
 class ActivityOptions : AppCompatActivity() {
     private lateinit var difficulty: String
     private var isSwitchCheckedAnimation = true
-    //private var isSwitchCheckedCompetitiveMode = false
+    private var isSwitchCheckedCompetitiveMode = false
     private var nbBtnOpt = 1
 
 
@@ -37,23 +37,34 @@ class ActivityOptions : AppCompatActivity() {
 
         this.isSwitchCheckedAnimation = this.intent.getBooleanExtra("animSwitch", isSwitchCheckedAnimation)
         switch_anim.isChecked = this.isSwitchCheckedAnimation
+        intent.putExtra("animSwitch", switch_anim.isChecked)
 
-//        this.isSwitchCheckedCompetitiveMode = this.intent.getBooleanExtra("competitiveMode", isSwitchCheckedCompetitiveMode)
-//        switch_competitive_mode.isChecked = this.isSwitchCheckedCompetitiveMode
+        this.isSwitchCheckedCompetitiveMode = this.intent.getBooleanExtra("competitiveMode", isSwitchCheckedCompetitiveMode)
+        switch_competitive_mode.isChecked = this.isSwitchCheckedCompetitiveMode
+        intent.putExtra("competitiveMode", switch_competitive_mode.isChecked)
+
 
         this.nbBtnOpt = this.intent.getIntExtra("nb_btn_opt", this.nbBtnOpt)
         nb_btn_option.text = this.nbBtnOpt.toString()
         sk_nb_btn_option.progress = this.nbBtnOpt
 
+        intent.putExtra("world", "hello")
+
+
 
         val intent = Intent(applicationContext, ActivityStart::class.java)
 
         switch_anim.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("anim", "switched")
             intent.putExtra("animSwitch", isChecked)
         }
-//        switch_competitive_mode.setOnCheckedChangeListener { _, isChecked ->
-//            intent.putExtra("competitiveMode", isChecked)
-//        }
+
+        switch_competitive_mode.setOnCheckedChangeListener { _, isChecked ->
+            Log.d("compet", "switched$isChecked")
+            intent.putExtra("competitiveMode", isChecked)
+            Log.d("compet", intent.extras.toString())
+
+        }
 
 
         sk_nb_btn_option.setOnSeekBarChangeListener(object :

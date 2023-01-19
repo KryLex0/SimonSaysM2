@@ -14,7 +14,9 @@ import kotlinx.android.synthetic.main.activity_start.*
 class ActivityStart : AppCompatActivity() {
     private var nbBtnOpt = 1
     private var difficulty: String = "Normal"
-    private var isSwitchChecked = true
+    private var isAnimSwitchChecked = true
+    private var isCompetitiveModeSwitchChecked = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +42,8 @@ class ActivityStart : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
             intent.putExtra("difficulty", this.difficulty)
             intent.putExtra("nb_btn_opt", this.nbBtnOpt)
-            intent.putExtra("animSwitch", this.isSwitchChecked)
+            intent.putExtra("animSwitch", this.isAnimSwitchChecked)
+            intent.putExtra("competitiveMode", this.isCompetitiveModeSwitchChecked)
             startActivity(intent)
         }
 
@@ -53,7 +56,8 @@ class ActivityStart : AppCompatActivity() {
             val intent = Intent(this, ActivityOptions::class.java)
             intent.putExtra("difficulty", this.difficulty)
             intent.putExtra("nb_btn_opt", this.nbBtnOpt)
-            intent.putExtra("animSwitch", this.isSwitchChecked)
+            intent.putExtra("animSwitch", this.isAnimSwitchChecked)
+            intent.putExtra("competitiveMode", this.isCompetitiveModeSwitchChecked)
             startActivityForResult(intent, 111)
         }
 
@@ -68,7 +72,10 @@ class ActivityStart : AppCompatActivity() {
             if (data != null) {
                 this.difficulty = data.getStringExtra("difficulty").toString()
                 this.nbBtnOpt = data.getIntExtra("nb_btn_opt", 1)
-                this.isSwitchChecked = data.getBooleanExtra("animSwitch", this.isSwitchChecked)
+                this.isAnimSwitchChecked = data.getBooleanExtra("animSwitch", this.isAnimSwitchChecked)
+                this.isCompetitiveModeSwitchChecked = data.getBooleanExtra("competitiveMode", this.isCompetitiveModeSwitchChecked)
+
+
             }
         }
 

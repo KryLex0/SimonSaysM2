@@ -112,7 +112,8 @@
         android:orientation="horizontal"
         android:layout_marginBottom="10dp"
         android:layout_gravity="center_horizontal"
-        android:id="@+id/timerLayoutLeft">
+        android:id="@+id/timerLayoutLeft"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/timerLeft"

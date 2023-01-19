@@ -71,10 +71,14 @@ class MainActivity : AppCompatActivity() {
 
         this.listBtnNextColor.addAll(arrayOf(btn_color1, btn_color2, btn_color3))
 
-        this.nbBtnOpt = this.intent.getIntExtra("nb_btn_opt", 1)
-        this.difficulty = this.intent.getStringExtra("difficulty").toString()
-        this.animBtn = this.intent.getBooleanExtra("animSwitch", this.animBtn)
-        //this.competitiveMode = this.intent.getBooleanExtra("competitiveMode", this.competitiveMode)
+        getExtraOptions()
+        if(competitiveMode){
+            timerLayoutLeft.visibility = View.VISIBLE
+        }
+
+        Log.d("competi", this.intent.extras.toString())
+
+        //Log.d("compet", this.competitiveMode.toString())
         //if(!this.competitiveMode){
         //    timerLayoutLeft.visibility = View.VISIBLE
         //}
@@ -151,6 +155,24 @@ class MainActivity : AppCompatActivity() {
         val newTimerLeft = timerLeft.toLong() + 3
         timerSecondsLeft.text = newTimerLeft.toString()
 
+    }
+
+    //get extra options from activityOptions
+    private fun getExtraOptions(){
+        this.nbBtnOpt = this.intent.getIntExtra("nb_btn_opt", 1)
+        this.difficulty = this.intent.getStringExtra("difficulty").toString()
+        this.animBtn = this.intent.getBooleanExtra("animSwitch", this.animBtn)
+        this.competitiveMode = this.intent.getBooleanExtra("competitiveMode", this.competitiveMode)
+    }
+
+    //set extra options for activityOptions
+    private fun setExtraOptions(intent: Intent): Intent{
+        intent.putExtra("nb_btn_opt", this.nbBtnOpt)
+        intent.putExtra("difficulty", this.difficulty)
+        intent.putExtra("animSwitch", this.animBtn)
+        intent.putExtra("competitiveMode", this.competitiveMode)
+
+        return intent
     }
 
     //init a timer for each round
@@ -239,8 +261,10 @@ class MainActivity : AppCompatActivity() {
 
         btn[index].startAnimation(anim)
         pauseTimer(timerParty)
-        if(isTimerLeftRoundRunning) {
-            pauseTimerLeft(timerLeftRound)
+        if(competitiveMode){
+            if(isTimerLeftRoundRunning) {
+                pauseTimerLeft(timerLeftRound)
+            }
         }
         //make the animations running one by one
         anim.setAnimationListener(object : Animation.AnimationListener {
@@ -261,10 +285,11 @@ class MainActivity : AppCompatActivity() {
                     }
                     //resume timerParty (timer for the whole game)
                     startTimer(timerParty)
-                    if(!isTimerLeftRoundRunning) {
-                        startTimerLeft(timerLeftRound)
+                    if(competitiveMode) {
+                        if (!isTimerLeftRoundRunning) {
+                            startTimerLeft(timerLeftRound)
+                        }
                     }
-
 
                 }
 
@@ -337,17 +362,18 @@ class MainActivity : AppCompatActivity() {
         timeRound = 0
         startTimer(timerRound)
 
-
-        //recreate a new timer for the new round
-        if(isTimerLeftRoundRunning){
-            timerLeftRound.cancel()
-            isTimerLeftRoundRunning = false
+        if(competitiveMode) {
+            //recreate a new timer for the new round
+            if (isTimerLeftRoundRunning) {
+                timerLeftRound.cancel()
+                isTimerLeftRoundRunning = false
+            }
+            timerLeft = tv_val_score.text.toString()
+            restartTimerLeft(timerLeft)
+            timerLeftRound = initTimerLeftRound(timerLeft)
+            startTimerLeft(timerLeftRound)
+            isTimerLeftRoundRunning = true
         }
-        timerLeft = tv_val_score.text.toString()
-        restartTimerLeft(timerLeft)
-        timerLeftRound = initTimerLeftRound(timerLeft)
-        startTimerLeft(timerLeftRound)
-        isTimerLeftRoundRunning = true
 
     }
 
@@ -403,7 +429,9 @@ class MainActivity : AppCompatActivity() {
         builder.setPositiveButton("Ok") { _, _ ->
             saveDataPlayer(editTextNamePlayer, tv_val_score, timerTotalValue)    //ajout a la bdd avec le score et le nom saisie dans l'edit text
             finish()
-            val intent = Intent(this, ActivityStart::class.java)
+            var intent = Intent(this, ActivityStart::class.java)
+            intent = setExtraOptions(intent)
+
             startActivity(intent)
         }
         builder.show()
@@ -412,7 +440,7 @@ class MainActivity : AppCompatActivity() {
 
     //save date in DB
     private fun saveDataPlayer(playerDataName: EditText, playerDataScore: TextView, playerDataTime: String) {
-        resumeRapidity()
+        //resumeRapidity()
         val nomJoueur: String = if(playerDataName.text.isEmpty()){
             "???"
         }else{
@@ -430,8 +458,8 @@ class MainActivity : AppCompatActivity() {
     //check the time for each round and append to an array if the user was fast, normal, or slow with the btn selection
     private fun checkTimeRound(timeForRound: Int){
         val score = (tv_val_score.text.toString()).toLong()
-        Log.d("round123", score.toString())
-        Log.d("round123", timeForRound.toString())
+        //Log.d("round123", score.toString())
+        //Log.d("round123", timeForRound.toString())
         var rapidity = ""
         if(timeForRound < (score-1)){
             rapidity = "rapide"
@@ -450,7 +478,7 @@ class MainActivity : AppCompatActivity() {
         }
         listRapidityRound.add(rapidity)
 
-        //Log.e("round123", listRapidityRound.toString())
+        Log.e("round123", listRapidityRound.toString())
     }
 
     //return a short message to tell the user if he has good reactivity or not
