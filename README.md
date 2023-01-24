@@ -1,5 +1,6 @@
 # SimonSaysM2
 > Application réalisée en Kotlin sous Android Studio
+
 > Projet réalisé dans le cadre du cours Hypermédia
 
 Application de mémorisation de couleurs.
